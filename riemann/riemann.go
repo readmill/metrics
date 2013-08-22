@@ -13,7 +13,7 @@ type Riemann struct {
 	client *raidman.Client
 }
 
-func (r *Riemann) Publish(e *metrics.Event) error {
+func (r *Riemann) Publish(evs ...*metrics.Event) error {
 	if r.client == nil {
 		client, err := r.open()
 		if err != nil {
@@ -22,14 +22,18 @@ func (r *Riemann) Publish(e *metrics.Event) error {
 		r.client = client
 	}
 
-	err := r.client.Send(&raidman.Event{
-		State:   e.State,
-		Service: e.Service,
-		Metric:  e.Metric,
-		Ttl:     e.Ttl,
-	})
-
-	return err
+	for _, e := range evs {
+		err := r.client.Send(&raidman.Event{
+			State:   e.State,
+			Service: e.Service,
+			Metric:  e.Metric,
+			Ttl:     e.Ttl,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *Riemann) open() (*raidman.Client, error) {

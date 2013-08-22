@@ -11,8 +11,10 @@ type StdLogger struct {
 	*log.Logger
 }
 
-func (l *StdLogger) Publish(e *metrics.Event) error {
-	l.Logger.Printf("%s %q (%q): %d", e.Service, e.Tags, e.Attributes, e.Metric)
+func (l *StdLogger) Publish(evs ...*metrics.Event) error {
+	for _, e := range evs {
+		l.Logger.Printf("%s %q (%q): %d", e.Service, e.Tags, e.Attributes, e.Metric)
+	}
 	return nil
 }
 

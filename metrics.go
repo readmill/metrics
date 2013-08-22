@@ -12,7 +12,7 @@ type Event struct {
 	State      string
 	Host       string
 	Service    string
-	Metric     int
+	Metric     int64
 	Ttl        float32
 	Tags       []string
 	Attributes map[string]interface{}
@@ -26,7 +26,7 @@ func (e *Event) Set(k string, v interface{}) {
 }
 
 type Interface interface {
-	Publish(e *Event) error
+	Publish(e ...*Event) error
 }
 
 func Register(name string, m Interface) {
