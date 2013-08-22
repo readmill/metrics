@@ -13,7 +13,7 @@ type Event struct {
 	Host       string
 	Service    string
 	Metric     int
-	Ttl        int
+	Ttl        float32
 	Tags       []string
 	Attributes map[string]interface{}
 }
