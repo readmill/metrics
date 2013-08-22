@@ -12,7 +12,12 @@
 
 * synopsis
 
-  import metrics
+  // Import the metrics library and register the "stdout" and
+  // "stderr" backends.
+  import (
+      metrics "github.com/readmill/metrics"
+      _       "github.com/readmill/metrics/std-logger"
+  )
 
   func main() {
       metrics.Use("stdout")
