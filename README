@@ -1,0 +1,34 @@
+
+
+    metrics
+
+    go metrics client
+
+
+* rationale
+
+  To avoid coupling code with a specific metrics backend (ex: riemann), we provide
+  a simple abstraction over backends, which is configurable via the command-line.
+
+* synopsis
+
+  import metrics
+
+  func main() {
+      metrics.Use("stdout")
+      metrics.Publish(&metrics.Event{
+          Service: "inbound.requests",
+          Metrics: 1,
+          Tags:    []string{"http"},
+      })
+  }
+
+* backends
+
+  - "stdout"
+  - "stderr"
+  - "riemann"
+
+* author
+
+  Alexis Sellier <alexis@readmill.com>
