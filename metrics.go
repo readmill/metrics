@@ -7,6 +7,7 @@ import (
 
 var Backends = map[string]Interface{}
 var current Interface = nil
+var prefix = ""
 
 type Event struct {
 	State      string
@@ -43,10 +44,17 @@ func Use(name string) error {
 
 func Publish(e *Event) error {
 	if current != nil {
+		// TODO Make copy of event
+		e.Service = prefix + e.Service
+
 		err := current.Publish(e)
 		if err != nil {
 			return fmt.Errorf("error publishing metric '%s': %s", e.Service, err)
 		}
 	}
 	return nil
+}
+
+func SetPrefix(pre string) {
+	prefix = pre
 }
