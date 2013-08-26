@@ -2,6 +2,7 @@ package riemann
 
 import (
 	"flag"
+	"strconv"
 
 	"github.com/readmill/metrics"
 	"github.com/readmill/raidman"
@@ -29,6 +30,9 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 			Metric:     e.Metric,
 			Ttl:        e.Ttl,
 			Attributes: e.Attributes,
+		}
+		if e.HttpStatus != 0 {
+			ev.Attributes["status"] = strconv.Itoa(e.HttpStatus)
 		}
 		err := r.client.Send(ev)
 		if err != nil {
