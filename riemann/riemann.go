@@ -32,6 +32,9 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 			Attributes: e.Attributes,
 		}
 		if e.HttpStatus != 0 {
+			if ev.Attributes == nil {
+				ev.Attributes = map[string]string{}
+			}
 			ev.Attributes["status"] = strconv.Itoa(e.HttpStatus)
 		}
 		err := r.client.Send(ev)
