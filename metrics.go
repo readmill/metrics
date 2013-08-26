@@ -3,6 +3,8 @@ package metrics
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
 )
 
 var Backends = map[string]Interface{}
@@ -13,13 +15,14 @@ type Event struct {
 	State      string
 	Host       string
 	Service    string
+	HttpStatus int
 	Metric     int64
 	Ttl        float32
 	Tags       []string
 	Attributes map[string]interface{}
 }
 
-func (e *Event) Set(k string, v interface{}) {
+func (e *Event) SetAttr(k string, v interface{}) {
 	if e.Attributes == nil {
 		e.Attributes = map[string]interface{}{}
 	}
@@ -42,17 +45,35 @@ func Use(name string) error {
 	return nil
 }
 
-func Publish(e *Event) error {
+func Publish(evs ...*Event) error {
 	if current != nil {
-		// TODO Make copy of event
-		e.Service = prefix + e.Service
+		for _, e := range evs {
+			// TODO Make copy of event
+			e.Service = prefix + e.Service
 
-		err := current.Publish(e)
-		if err != nil {
-			return fmt.Errorf("error publishing metric '%s': %s", e.Service, err)
+			err := current.Publish(e)
+			if err != nil {
+				return fmt.Errorf("error publishing metric '%s': %s", e.Service, err)
+			}
 		}
 	}
 	return nil
+}
+
+func PublishHttpAccess(r *http.Request, d time.Duration, status int) error {
+	return Publish(
+		&Event{
+			Service: "inbound.request.timings",
+			Tags:    []string{"http", "inbound", "percentiles"},
+			Metric:  int64(d / time.Millisecond),
+		},
+		&Event{
+			Service:    "outbound",
+			HttpStatus: status,
+			Tags:       []string{"http", "outbound", "rate"},
+			Metric:     1,
+		},
+	)
 }
 
 func SetPrefix(pre string) {
