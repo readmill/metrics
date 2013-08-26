@@ -19,12 +19,12 @@ type Event struct {
 	Metric     int64
 	Ttl        float32
 	Tags       []string
-	Attributes map[string]interface{}
+	Attributes map[string]string
 }
 
-func (e *Event) SetAttr(k string, v interface{}) {
+func (e *Event) SetAttr(k string, v string) {
 	if e.Attributes == nil {
-		e.Attributes = map[string]interface{}{}
+		e.Attributes = map[string]string{}
 	}
 	e.Attributes[k] = v
 }

@@ -23,12 +23,14 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 	}
 
 	for _, e := range evs {
-		err := r.client.Send(&raidman.Event{
-			State:   e.State,
-			Service: e.Service,
-			Metric:  e.Metric,
-			Ttl:     e.Ttl,
-		})
+		ev := &raidman.Event{
+			State:      e.State,
+			Service:    e.Service,
+			Metric:     e.Metric,
+			Ttl:        e.Ttl,
+			Attributes: e.Attributes,
+		}
+		err := r.client.Send(ev)
 		if err != nil {
 			return err
 		}
