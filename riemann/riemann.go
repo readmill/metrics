@@ -9,8 +9,8 @@ import (
 )
 
 type Riemann struct {
-	addr   string
-	proto  string
+	addr   *string
+	proto  *string
 	client *raidman.Client
 }
 
@@ -43,11 +43,11 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 }
 
 func (r *Riemann) open() (*raidman.Client, error) {
-	return raidman.Dial(r.proto, r.addr)
+	return raidman.Dial(*r.proto, *r.addr)
 }
 
 func init() {
 	addr := flag.String("riemann.addr", ":5555", "riemann host address")
 	proto := flag.String("riemann.proto", "tcp", "riemann network protocol (tcp, udp)")
-	metrics.Register("riemann", &Riemann{*addr, *proto, nil})
+	metrics.Register("riemann", &Riemann{addr, proto, nil})
 }
