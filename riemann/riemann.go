@@ -15,7 +15,7 @@ var (
 
 type Riemann struct {
 	addr   *string
-	proto  *string
+	net    *string
 	client *raidman.Client
 }
 
@@ -37,7 +37,7 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 			Attributes: e.Attributes,
 		}
 		if ev.Attributes == nil {
-			ev.Attributes = map[string]string{}
+			ev.Attributes = map[string]interface{}{}
 		}
 		if e.HttpStatus != 0 {
 			ev.Attributes[HttpStatusAttr] = strconv.Itoa(e.HttpStatus)
@@ -54,11 +54,11 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 }
 
 func (r *Riemann) open() (*raidman.Client, error) {
-	return raidman.Dial(*r.proto, *r.addr)
+	return raidman.Dial(*r.net, *r.addr)
 }
 
 func init() {
 	addr := flag.String("riemann.addr", ":5555", "riemann host address")
-	proto := flag.String("riemann.proto", "tcp", "riemann network protocol (tcp, udp)")
-	metrics.Register("riemann", &Riemann{addr, proto, nil})
+	netwrk := flag.String("riemann.net", "tcp", "riemann network protocol (tcp, udp)")
+	metrics.Register("riemann", &Riemann{addr, netwrk, nil})
 }

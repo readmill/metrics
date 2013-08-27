@@ -7,10 +7,17 @@ import (
 	"time"
 )
 
+// Backends holds a map of registered metrics backends.
 var Backends = map[string]Interface{}
-var current Interface = nil
-var prefix = ""
 
+// current is the current selected backend.
+var current Interface = nil
+
+// servicePrefix is prefixed to all event service names.
+var servicePrefix = ""
+
+// Event represents an event which can be published to
+// a backend.
 type Event struct {
 	State      string
 	Host       string
@@ -20,24 +27,30 @@ type Event struct {
 	Ttl        float32
 	Tags       []string
 	Transient  bool
-	Attributes map[string]string
+	Attributes map[string]interface{}
 }
 
-func (e *Event) SetAttr(k string, v string) {
+// SetAttr sets an attribute with the given key and value.
+// The value must be a string or a boolean.
+func (e *Event) SetAttr(k string, v interface{}) {
 	if e.Attributes == nil {
-		e.Attributes = map[string]string{}
+		e.Attributes = map[string]interface{}{}
 	}
 	e.Attributes[k] = v
 }
 
+// Interface implements the Publish method.
+// It is the type of all metrics backends.
 type Interface interface {
 	Publish(e ...*Event) error
 }
 
+// Register registers a backend with the metrics library.
 func Register(name string, m Interface) {
 	Backends[name] = m
 }
 
+// Use selects the metrics backend to use for Publishing.
 func Use(name string) error {
 	if _, ok := Backends[name]; !ok {
 		return errors.New("backend not found")
@@ -46,11 +59,12 @@ func Use(name string) error {
 	return nil
 }
 
+// Publish publishes one or more events to the current backend.
 func Publish(evs ...*Event) error {
 	if current != nil {
 		for _, e := range evs {
 			// TODO Make copy of event
-			e.Service = prefix + e.Service
+			e.Service = servicePrefix + e.Service
 
 			err := current.Publish(e)
 			if err != nil {
@@ -61,6 +75,7 @@ func Publish(evs ...*Event) error {
 	return nil
 }
 
+// PublishHttpAccess publishes an HTTP access to the current backend.
 func PublishHttpAccess(r *http.Request, d time.Duration, status int) error {
 	return Publish(
 		&Event{
@@ -79,6 +94,9 @@ func PublishHttpAccess(r *http.Request, d time.Duration, status int) error {
 	)
 }
 
+// SetPrefix sets the event service prefix.
+// Use this to prefix all events with the name of the service
+// generating the events.
 func SetPrefix(pre string) {
-	prefix = pre
+	servicePrefix = pre
 }
