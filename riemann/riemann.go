@@ -8,6 +8,11 @@ import (
 	"github.com/readmill/raidman"
 )
 
+var (
+	HttpStatusAttr = "status"
+	PersistAttr    = "persist"
+)
+
 type Riemann struct {
 	addr   *string
 	proto  *string
@@ -35,10 +40,10 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 			ev.Attributes = map[string]string{}
 		}
 		if e.HttpStatus != 0 {
-			ev.Attributes["status"] = strconv.Itoa(e.HttpStatus)
+			ev.Attributes[HttpStatusAttr] = strconv.Itoa(e.HttpStatus)
 		}
-		if e.Transient {
-			ev.Attributes["persist"] = "false"
+		if !e.Transient {
+			ev.Attributes[PersistAttr] = "true"
 		}
 		err := r.client.Send(ev)
 		if err != nil {
