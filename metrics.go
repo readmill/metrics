@@ -19,6 +19,7 @@ type Event struct {
 	Metric     int64
 	Ttl        float32
 	Tags       []string
+	Transient  bool
 	Attributes map[string]string
 }
 
@@ -63,15 +64,17 @@ func Publish(evs ...*Event) error {
 func PublishHttpAccess(r *http.Request, d time.Duration, status int) error {
 	return Publish(
 		&Event{
-			Service: "inbound.request.timings",
-			Tags:    []string{"http", "inbound", "percentiles"},
-			Metric:  int64(d / time.Millisecond),
+			Service:   "inbound.request.timings",
+			Tags:      []string{"http", "inbound", "percentiles"},
+			Metric:    int64(d / time.Millisecond),
+			Transient: true,
 		},
 		&Event{
 			Service:    "outbound",
 			HttpStatus: status,
 			Tags:       []string{"http", "outbound", "rate"},
 			Metric:     1,
+			Transient:  true,
 		},
 	)
 }

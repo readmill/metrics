@@ -31,11 +31,14 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 			Ttl:        e.Ttl,
 			Attributes: e.Attributes,
 		}
+		if ev.Attributes == nil {
+			ev.Attributes = map[string]string{}
+		}
 		if e.HttpStatus != 0 {
-			if ev.Attributes == nil {
-				ev.Attributes = map[string]string{}
-			}
 			ev.Attributes["status"] = strconv.Itoa(e.HttpStatus)
+		}
+		if e.Transient {
+			ev.Attributes["persist"] = "false"
 		}
 		err := r.client.Send(ev)
 		if err != nil {
