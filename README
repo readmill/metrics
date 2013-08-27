@@ -20,10 +20,11 @@
   )
 
   func main() {
+      metrics.SetPrefix("mysrv.")
       metrics.Use("stdout")
       metrics.Publish(&metrics.Event{
           Service: "inbound.requests",
-          Metrics: 1,
+          Metric:  1,
           Tags:    []string{"http"},
       })
   }
@@ -33,6 +34,10 @@
   - "stdout"
   - "stderr"
   - "riemann"
+
+* docs
+
+  go doc
 
 * author
 
