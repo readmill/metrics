@@ -2,6 +2,7 @@ package riemann
 
 import (
 	"flag"
+	"io"
 	"strconv"
 
 	"github.com/readmill/metrics"
