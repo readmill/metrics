@@ -2,8 +2,10 @@ package metrics
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -15,6 +17,9 @@ var current Interface = nil
 
 // servicePrefix is prefixed to all event service names.
 var servicePrefix = ""
+
+// defaultHost is the value for "host" property of events.
+var defaultHost *string
 
 // Event represents an event which can be published to
 // a backend.
@@ -66,6 +71,10 @@ func Publish(evs ...*Event) error {
 			// TODO Make copy of event
 			e.Service = servicePrefix + e.Service
 
+			if e.Host == "" {
+				e.Host = *defaultHost
+			}
+
 			err := current.Publish(e)
 			if err != nil {
 				return fmt.Errorf("error publishing metric '%s': %s", e.Service, err)
@@ -77,15 +86,23 @@ func Publish(evs ...*Event) error {
 
 // PublishHttpAccess publishes an HTTP access to the current backend.
 func PublishHttpAccess(r *http.Request, d time.Duration, status int) error {
+	state := "ok"
+
+	if status == http.StatusInternalServerError {
+		state = "critical"
+	}
+
 	return Publish(
 		&Event{
 			Service:   "inbound.timings",
+			State:     state,
 			Tags:      []string{"http", "inbound", "percentiles"},
 			Metric:    int64(d / time.Millisecond),
 			Transient: true,
 		},
 		&Event{
 			Service:    "outbound",
+			State:      state,
 			HttpStatus: status,
 			Tags:       []string{"http", "outbound", "rate"},
 			Metric:     1,
@@ -99,4 +116,17 @@ func PublishHttpAccess(r *http.Request, d time.Duration, status int) error {
 // generating the events.
 func SetPrefix(pre string) {
 	servicePrefix = pre
+}
+
+// SetDefaultHost sets the default value of the host property for all events.
+func SetDefaultHost(h string) {
+	defaultHost = &h
+}
+
+func init() {
+	host, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+	defaultHost = flag.String("metrics.host", host, "hostname to use in events")
 }
