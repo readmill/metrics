@@ -79,7 +79,7 @@ func Publish(evs ...*Event) error {
 func PublishHttpAccess(r *http.Request, d time.Duration, status int) error {
 	return Publish(
 		&Event{
-			Service:   "inbound.request.timings",
+			Service:   "inbound.timings",
 			Tags:      []string{"http", "inbound", "percentiles"},
 			Metric:    int64(d / time.Millisecond),
 			Transient: true,
