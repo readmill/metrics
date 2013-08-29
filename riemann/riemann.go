@@ -48,6 +48,9 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 		}
 		err := r.client.Send(ev)
 		if err != nil {
+			if err == io.EOF {
+				r.client = nil
+			}
 			return err
 		}
 	}
