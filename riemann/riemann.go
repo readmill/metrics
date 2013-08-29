@@ -34,6 +34,7 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 			Service:    e.Service,
 			Metric:     e.Metric,
 			Ttl:        e.Ttl,
+			Tags:       e.Tags,
 			Attributes: e.Attributes,
 		}
 		if ev.Attributes == nil {
