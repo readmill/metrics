@@ -31,6 +31,7 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 
 	for _, e := range evs {
 		ev := &raidman.Event{
+			Host:       e.Host,
 			State:      e.State,
 			Service:    e.Service,
 			Metric:     e.Metric,
