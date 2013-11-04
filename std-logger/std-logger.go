@@ -19,6 +19,7 @@ func (l *StdLogger) Publish(evs ...*metrics.Event) error {
 }
 
 func init() {
+	log.Println("registering stdio")
 	metrics.Register("stdout", &StdLogger{log.New(os.Stdout, "[metrics] ", log.LstdFlags)})
 	metrics.Register("stderr", &StdLogger{log.New(os.Stderr, "[metrics] ", log.LstdFlags)})
 }

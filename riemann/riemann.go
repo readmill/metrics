@@ -3,6 +3,7 @@ package riemann
 import (
 	"flag"
 	"io"
+	"log"
 	"strconv"
 
 	"github.com/readmill/metrics"
@@ -21,6 +22,7 @@ type Riemann struct {
 }
 
 func (r *Riemann) Publish(evs ...*metrics.Event) error {
+	log.Println("entered publish")
 	if r.client == nil {
 		client, err := r.open()
 		if err != nil {
@@ -66,5 +68,6 @@ func (r *Riemann) open() (*raidman.Client, error) {
 func init() {
 	addr := flag.String("riemann.addr", ":5555", "riemann host address")
 	netwrk := flag.String("riemann.net", "tcp", "riemann network protocol (tcp, udp)")
+	log.Println("registering riemann")
 	metrics.Register("riemann", &Riemann{addr, netwrk, nil})
 }
