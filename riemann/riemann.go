@@ -22,7 +22,6 @@ type Riemann struct {
 }
 
 func (r *Riemann) Publish(evs ...*metrics.Event) error {
-	log.Println("entered publish")
 	if r.client == nil {
 		client, err := r.open()
 		if err != nil {
@@ -50,8 +49,18 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 		if !e.Transient {
 			ev.Attributes[PersistAttr] = "true"
 		}
+		log.Println("Created event:")
+		log.Printf("Host: %s", ev.Host)
+		log.Printf("State: %s", ev.State)
+		log.Printf("Service: %s", e.Service)
+		log.Printf("Metric: %s", e.Metric)
+		log.Printf("Ttl: %s", e.Ttl)
+		log.Printf("Tags: %s", e.Tags)
+		log.Printf("Attributes: %s", e.Attributes)
+
 		err := r.client.Send(ev)
 		if err != nil {
+			log.Printf("error when sending: %s", err)
 			if err == io.EOF {
 				r.client = nil
 			}
