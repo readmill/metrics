@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"strconv"
-	"time"
 
 	"github.com/readmill/metrics"
 	"github.com/readmill/raidman"
