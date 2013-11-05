@@ -71,7 +71,6 @@ func Publish(evs ...*Event) error {
 		for _, e := range evs {
 			// TODO Make copy of event
 			e.Service = servicePrefix + e.Service
-			log.Println("service: %s", e.Service)
 
 			if e.Host == "" {
 				e.Host = *defaultHost
