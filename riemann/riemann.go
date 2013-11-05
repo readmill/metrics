@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/readmill/metrics"
 	"github.com/readmill/raidman"
@@ -33,6 +34,7 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 	for _, e := range evs {
 		ev := &raidman.Event{
 			Host:       e.Host,
+			Time:       time.Now().Unix(),
 			State:      e.State,
 			Service:    e.Service,
 			Metric:     e.Metric,
