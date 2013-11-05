@@ -50,19 +50,7 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 		}
 		if !e.Transient {
 			ev.Attributes[PersistAttr] = "true"
-		} else {
-			ev.Attributes[PersistAttr] = "false"
 		}
-		ev.Attributes["version"] = "aae23d7dff199416256e490c6dfea81679d9c1aa"
-
-		log.Println("Created event:")
-		log.Printf("Host: %s", ev.Host)
-		log.Printf("State: %s", ev.State)
-		log.Printf("Service: %s", e.Service)
-		log.Printf("Metric: %s", e.Metric)
-		log.Printf("Ttl: %s", e.Ttl)
-		log.Printf("Tags: %s", e.Tags)
-		log.Printf("Attributes: %s", e.Attributes)
 
 		err := r.client.Send(ev)
 		if err != nil {
