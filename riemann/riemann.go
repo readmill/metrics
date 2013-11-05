@@ -34,13 +34,18 @@ func (r *Riemann) Publish(evs ...*metrics.Event) error {
 	for _, e := range evs {
 		ev := &raidman.Event{
 			Host:       e.Host,
-			Time:       time.Now().Unix() + 3600*24,
 			State:      e.State,
 			Service:    e.Service,
 			Metric:     e.Metric,
 			Ttl:        e.Ttl,
 			Tags:       e.Tags,
 			Attributes: e.Attributes,
+		}
+		if ev.Ttl == 0 {
+			ev.Ttl = 300
+		}
+		if ev.Metric == 0 {
+			ev.Metric = 1
 		}
 		if ev.Attributes == nil {
 			ev.Attributes = map[string]interface{}{}
